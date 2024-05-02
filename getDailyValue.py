@@ -7,7 +7,7 @@ from yahoo_finance_api2 import share
 from yahoo_finance_api2.exceptions import YahooFinanceError
 
 df_codes = pd.read_csv('jpx_code.csv')
-codes_list = df_codes['コード'].astype('int64').tolist()
+codes_list = df_codes['コード'].tolist()
 
 cols = ['datetime', 'open', 'high', 'low', 'close', 'volume', 'code', 'timestamp']
 df = pd.DataFrame(index=[], columns=cols)
@@ -30,6 +30,10 @@ for code in codes_list:
             df1['datetime'] = pd.to_datetime(df1.timestamp, unit = 'ms') + datetime.timedelta(hours = 9)
             df1['code'] = code
             df1.set_index('datetime', inplace = True)
+
+            # 空または全てがNaNの列を削除
+            df = df.dropna(axis=1, how='all')
+            df1 = df1.dropna(axis=1, how='all')
 
             df = pd.concat([df, df1], axis = 0)
         except:
